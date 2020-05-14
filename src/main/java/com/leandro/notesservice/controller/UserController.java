@@ -1,10 +1,12 @@
 package com.leandro.notesservice.controller;
 
+import javax.validation.Valid;
 
 import com.leandro.notesservice.entity.User;
 import com.leandro.notesservice.repository.UserRepository;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,27 +20,30 @@ public class UserController {
     private UserRepository userRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserController(UserRepository applicationUserRepository,
-                          BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserController(UserRepository applicationUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         userRepository = applicationUserRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @PostMapping("/signup")
-    public boolean signUp(@RequestBody User user) {
+    public boolean signUp(@RequestBody @Valid User user, BindingResult bindingResult) {
 
-        if (user.getPassword().length() >= 8) {
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
-            return true;
-        }else{
+        if (bindingResult.hasErrors()) {
             return false;
         }
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return true;
 
     }
 
     @PutMapping("/update")
-    public User updateUser(@RequestHeader("username") String oldUser, @RequestBody User newUser) {
+    public User updateUser(@RequestHeader("username") String oldUser, @RequestBody @Valid User newUser,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return null;
+        }
 
         User user = userRepository.findByUsername(oldUser);
 
@@ -46,11 +51,11 @@ public class UserController {
             user.setUsername(newUser.getUsername());
             userRepository.save(user);
             return user;
-        }else{
+        } else {
             return null;
-        }       
+        }
     }
-    
+
     @DeleteMapping("/delete")
     public boolean deleteUser(@RequestHeader("username") String username) {
 

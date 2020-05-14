@@ -2,7 +2,19 @@ package com.leandro.notesservice.entity;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -10,23 +22,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Table(name = "notes")
 public class Note {
 
-   
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="ID")
+    @Column(name = "ID")
+    @NotNull
     private long id;
 
-    @Column(name="title")
+    @Size(max = 60, message = "Title can not have more than 60 characters")
+    @Column(name = "title")
     private String title;
-    
-    @Column(name="content")
+
+    @Column(name = "content")
     private String content;
 
-    @Column(name="date")
+    @Column(name = "date")
     @Temporal(TemporalType.DATE)
     private Date date = new Date();
 
-    @JsonIgnoreProperties({"notes", "password"})
+    @JsonIgnoreProperties({ "notes", "password" })
     @ManyToOne(optional = false)
     @JoinColumn(name = "user")
     private User user;
@@ -83,7 +96,7 @@ public class Note {
 
     @Override
     public String toString() {
-        return "Note [ id=" + id +", content=" + content + ", date=" + date + ", title=" + title + ", user=" + user.getUsername() + "]";
+        return "Note [ id=" + id + ", content=" + content + ", date=" + date + ", title=" + title + ", user=" + user.getUsername() + "]";
     }
 
 }

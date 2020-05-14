@@ -10,21 +10,31 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern.Flag;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name="user")
+@Table(name = "user")
 public class User {
 
     @Id
-    @Column(name="username")
+    @Column(name = "username")
+    @NotNull
+    @Size(min = 3, max = 15)
+    @Pattern(regexp = "^(?!.*\\.$)(?!.*\\.\\.)(?!\\..*)[a-z0-9_.]{3,15}$", flags = Flag.MULTILINE)
     private String username;
 
-    @Column(name="password")
+    @Column(name = "password")
+    @NotNull
+    @Size(min = 8)
     private String password;
 
     @JsonIgnoreProperties("user")
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Note> notes = new ArrayList<>();
 
     public User() {
@@ -62,6 +72,6 @@ public class User {
     @Override
     public String toString() {
         return "username=" + username;
-    }   
+    }
 
 }
