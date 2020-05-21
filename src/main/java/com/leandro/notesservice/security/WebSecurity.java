@@ -16,6 +16,8 @@ import com.leandro.notesservice.service.UserDetailsServiceImpl;
 
 import static com.leandro.notesservice.security.SecurityConstants.SIGN_UP_URL;
 
+import java.util.Arrays;
+
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
@@ -48,8 +50,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.applyPermitDefaultValues();
+    configuration.setAllowedHeaders(Arrays.asList("username", "Authorization", "content-type"));
+    configuration.setExposedHeaders(Arrays.asList("Authorization", "user"));
+    configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT", "DELETE"));
+    
     final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+    source.registerCorsConfiguration("/**", configuration);
     return source;
   }
 }
